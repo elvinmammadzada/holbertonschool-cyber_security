@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo.nmap(?=.-sn)(?=.\$1)(?=.*-PR)(?:\s+(?:-sn|-PR|\$1))+$
+sudo nmap -sn -PR $1
