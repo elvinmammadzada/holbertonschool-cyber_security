@@ -9,8 +9,8 @@ def post_request(url, body_params = {})
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = (uri.scheme == 'https')
 
-  request = Net::HTTP::Post.new(uri.request_uri)
-  request.set_form_data(body_params) if body_params && !body_params.empty?
+  request = Net::HTTP::Post.new(uri.request_uri, { 'Content-Type' => 'application/json' })
+  request.body = body_params.to_json if body_params
 
   response = http.request(request)
 
