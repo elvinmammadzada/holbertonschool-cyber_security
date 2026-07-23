@@ -5,11 +5,12 @@ require 'json'
 
 def post_request(url, body_params = {})
   uri = URI.parse(url)
+
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = (uri.scheme == 'https')
 
-  request = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/json' })
-  request.body = body_params.to_json
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request.set_form_data(body_params) if body_params && !body_params.empty?
 
   response = http.request(request)
 
@@ -17,13 +18,8 @@ def post_request(url, body_params = {})
   puts "Response body:"
 
   if response.body.nil? || response.body.strip.empty?
-    puts "{\n}"
+    puts "{}"
   else
-    begin
-      parsed = JSON.parse(response.body)
-      puts JSON.pretty_generate(parsed)
-    rescue JSON::ParserError
-      puts response.body
-    end
+    puts response.body
   end
 end
