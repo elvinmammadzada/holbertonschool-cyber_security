@@ -1,20 +1,41 @@
 #!/usr/bin/env ruby
+
 require 'optparse'
 
 TASKS_FILE = 'tasks.txt'
 
-# Helper method to read tasks from file
-def read_tasks
-  return [] unless File.exist?(TASKS_FILE)
-
-  File.readlines(TASKS_FILE, chomp: true).reject(&:empty?)
+def add_task(task)
+  File.open(TASKS_FILE, 'a') { |f| f.puts(task) }
+  puts "Task '#{task}' added."
 end
 
-# Helper method to write tasks to file
-def write_tasks(tasks)
-  File.open(TASKS_FILE, 'w') do |file|
-    tasks.each { |task| file.puts(task) }
+def list_tasks
+  tasks = File.exist?(TASKS_FILE) ? File.readlines(TASKS_FILE).map(&:chomp) : []
+  puts "Tasks:"
+  tasks.each_with_index do |task, index|
+    puts "#{index + 1}. #{task}"
   end
+end
+
+def remove_task(index)
+  unless File.exist?(TASKS_FILE)
+    puts "No tasks found."
+    return
+  end
+
+  tasks = File.readlines(TASKS_FILE).map(&:chomp)
+  idx = index.to_i - 1
+
+  if idx < 0 || idx >= tasks.length
+    puts "Invalid index."
+    return
+  end
+
+  removed = tasks.delete_at(idx)
+  File.open(TASKS_FILE, 'w') do |f|
+    tasks.each { |t| f.puts(t) }
+  end
+  puts "Task '#{removed}' removed."
 end
 
 options = {}
@@ -31,7 +52,7 @@ OptionParser.new do |opts|
   end
 
   opts.on("-r", "--remove INDEX", "Remove a task by index") do |index|
-    options[:remove] = index.to_i
+    options[:remove] = index
   end
 
   opts.on("-h", "--help", "Show help") do
@@ -40,33 +61,6 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-# Handle actions
-if options[:add]
-  task = options[:add]
-  tasks = read_tasks
-  tasks << task
-  write_tasks(tasks)
-  puts "Task '#{task}' added."
-
-elsif options[:list]
-  tasks = read_tasks
-  if tasks.empty?
-    puts "No tasks found."
-  else
-    tasks.each_with_index do |task, index|
-      puts "#{index + 1}. #{task}"
-    end
-  end
-
-elsif options[:remove]
-  index = options[:remove]
-  tasks = read_tasks
-
-  if index > 0 && index <= tasks.length
-    removed_task = tasks.delete_at(index - 1)
-    write_tasks(tasks)
-    puts "Task '#{removed_task}' removed."
-  else
-    puts "Invalid task index."
-  end
-end
+add_task(options[:add]) if options[:add]
+list_tasks if options[:list]
+remove_task(options[:remove]) if options[:remove]
